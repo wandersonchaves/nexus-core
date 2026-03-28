@@ -7,6 +7,11 @@ export const tenantSegmentEnum = pgEnum('tenant_segment', [
   'NGO',
 ]);
 
+export const whatsappStatusEnum = pgEnum('whatsapp_status', [
+  'CONNECTED',
+  'DISCONNECTED',
+]);
+
 export const tenants = pgTable('tenants', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
@@ -14,6 +19,9 @@ export const tenants = pgTable('tenants', {
   segment: tenantSegmentEnum('segment').notNull(),
   status: text('status').notNull().default('active'),
   config: jsonb('config').$type<Record<string, any>>().default({}),
+  maxLeads: integer('max_leads').notNull().default(100),
+  maxMessagesMonth: integer('max_messages_month').notNull().default(500),
+  aiTokensLimit: integer('ai_tokens_limit').notNull().default(50000),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -38,6 +46,24 @@ export const leads = pgTable('leads', {
   segment: tenantSegmentEnum('segment').notNull(),
   performanceScore: integer('performance_score'),
   aiAnalysis: text('ai_analysis'),
+  lastContactAt: timestamp('last_contact_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  ...withTenant,
+});
+
+export const whatsappInstances = pgTable('whatsapp_instances', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  status: whatsappStatusEnum('status').notNull().default('DISCONNECTED'),
+  sessionData: jsonb('session_data').$type<Record<string, any>>().default({}),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  ...withTenant,
+});
+
+export const roles = pgTable('roles', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  permissions: jsonb('permissions').$type<string[]>().default([]),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   ...withTenant,
 });
