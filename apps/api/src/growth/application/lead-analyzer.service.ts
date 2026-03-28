@@ -1,5 +1,5 @@
 import { Injectable, Inject, Logger, NotFoundException } from '@nestjs/common';
-import { ILLMProvider } from '../domain/interfaces';
+import type { ILLMProvider } from '../domain/interfaces';
 import { DRIZZLE } from '../../infrastructure/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from '../../infrastructure/database/schema';
