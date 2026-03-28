@@ -1,6 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import type { IScraper, IJobProducer } from '../domain/interfaces';
 import { GrowthSearchDto } from '../dto/growth-search.dto';
+
 import { DRIZZLE } from '../../infrastructure/database/database.module';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from '../../infrastructure/database/schema';
