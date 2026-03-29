@@ -7,6 +7,11 @@ export class TenantMiddleware implements NestMiddleware {
   constructor(private readonly tenantContext: TenantContext) {}
 
   use(req: Request, res: Response, next: NextFunction) {
+    const url = req.url;
+    if (url === '/' || url === '/health') {
+      return next();
+    }
+
     const tenantId = req.headers['x-tenant-id'] as string;
 
     if (!tenantId) {
