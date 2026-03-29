@@ -1,0 +1,36 @@
+{
+  "name": "nexus-core",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wandersonchaves/nexus-core.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wandersonchaves/nexus-core/issues"
+  },
+  "homepage": "https://github.com/wandersonchaves/nexus-core#readme",
+  "dependencies": {
+    "sst": "4.5.12"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.161",
+    "sst": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
