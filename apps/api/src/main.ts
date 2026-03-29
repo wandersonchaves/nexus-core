@@ -7,6 +7,7 @@ import { AppModule } from './app.module';
 import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
+  process.setMaxListeners(20);
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   // Use nestjs-pino for structured JSON logs
