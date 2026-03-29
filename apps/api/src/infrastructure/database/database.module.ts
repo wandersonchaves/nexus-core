@@ -1,5 +1,5 @@
-import { Module, Global, Scope, Inject } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Module, Global, Scope } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { TenantContext } from './tenant-context.service';
@@ -10,6 +10,7 @@ export const POSTGRES_POOL = 'POSTGRES_POOL';
 
 @Global()
 @Module({
+  imports: [ConfigModule],
   providers: [
     TenantContext,
     {

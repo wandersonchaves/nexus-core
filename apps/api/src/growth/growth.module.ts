@@ -25,6 +25,12 @@ import { GrowthController } from './growth.controller';
       useClass: OpenAiProvider,
     },
   ],
-  exports: [ScrapingService, LeadAnalyzerService],
+  exports: [
+    ScrapingService,
+    LeadAnalyzerService,
+    'IScraper',
+    'IJobProducer',
+    'ILLMProvider',
+  ],
 })
 export class GrowthModule {}

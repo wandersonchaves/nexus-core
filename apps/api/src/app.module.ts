@@ -3,6 +3,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bullmq';
+import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { LoggerModule } from 'nestjs-pino';
@@ -12,6 +13,7 @@ import { HealthModule } from './infrastructure/health/health.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { OnboardingModule } from './modules/onboarding/onboarding.module';
 import { QuotaModule } from './modules/quota/quota.module';
+import { DatabaseModule } from './infrastructure/database/database.module';
 import { TenantMiddleware } from './infrastructure/database/tenant.middleware';
 import { AllExceptionsFilter } from './infrastructure/filters/all-exceptions.filter';
 import { PerformanceInterceptor } from './infrastructure/interceptors/performance.interceptor';
@@ -20,6 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
@@ -47,6 +50,7 @@ import { v4 as uuidv4 } from 'uuid';
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
       }),
     }),
+    DatabaseModule,
     HealthModule,
     MessagingModule,
     GrowthModule,
