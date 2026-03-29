@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { LoggerModule } from 'nestjs-pino';
 import { MessagingModule } from './modules/messaging/messaging.module';
@@ -18,19 +18,18 @@ import { TenantMiddleware } from './infrastructure/database/tenant.middleware';
 import { AllExceptionsFilter } from './infrastructure/filters/all-exceptions.filter';
 import { PerformanceInterceptor } from './infrastructure/interceptors/performance.interceptor';
 import { QuotaGuard } from './modules/quota/quota.guard';
-import { v4 as uuidv4 } from 'uuid';
+import { AppThrottlerGuard } from './infrastructure/guards/app-throttler.guard';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+    }),
     LoggerModule.forRoot({
       pinoHttp: {
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
         transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty' } : undefined,
-        genReqId: (req) => req.headers['x-request-id'] || uuidv4(),
-        customProps: (req) => ({
-          tenant_id: req.headers['x-tenant-id'],
-        }),
       },
     }),
     BullModule.forRoot({
@@ -71,7 +70,7 @@ import { v4 as uuidv4 } from 'uuid';
     },
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: AppThrottlerGuard,
     },
     {
       provide: APP_GUARD,

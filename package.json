@@ -8,10 +8,10 @@
   ],
   "main": "index.js",
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present"
+    "dev": "concurrently -n \"api,web\" -c \"cyan,magenta\" \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.161",
+    "concurrently": "^9.2.1",
     "sst": "^3.0.0",
     "typescript": "^5.0.0"
   }

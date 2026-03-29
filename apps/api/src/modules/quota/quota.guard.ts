@@ -21,10 +21,17 @@ export class QuotaGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const url = request.url;
+
+    // Explicitly bypass health and root paths
+    if (url === '/' || url === '/health') {
+      return true;
+    }
+
     const metric = this.reflector.get<string>(CHECK_QUOTA, context.getHandler());
     if (!metric) return true;
 
-    const request = context.switchToHttp().getRequest();
     const tenantId = request.headers['x-tenant-id'];
 
     if (!tenantId) {

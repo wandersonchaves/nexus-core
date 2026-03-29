@@ -11,6 +11,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
 
+    // EXTREMELY IMPORTANT: Log the full exception object for debugging
+    console.log('[DEBUG-RLS] Global Exception caught:', exception);
+
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -23,10 +26,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message: (exception as any).message || 'Internal Server Error',
     };
 
-    // Simulate Sentry/CloudWatch integration
     if (httpStatus >= 500) {
       this.logger.error(`[CRITICAL] Status: ${httpStatus} - Path: ${responseBody.path} - Error: ${responseBody.message}`);
-      // Sentry.captureException(exception);
     }
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);

@@ -1,16 +1,16 @@
 import { Module, Global, Scope } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { TenantContext } from './tenant-context.service';
 import * as schema from './schema';
 
 export const DRIZZLE = 'DRIZZLE';
+export const DRIZZLE_SINGLETON = 'DRIZZLE_SINGLETON';
 export const POSTGRES_POOL = 'POSTGRES_POOL';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
   providers: [
     TenantContext,
     {
@@ -22,6 +22,13 @@ export const POSTGRES_POOL = 'POSTGRES_POOL';
       inject: [ConfigService],
     },
     {
+      provide: DRIZZLE_SINGLETON,
+      useFactory: (sql: postgres.Sql): PostgresJsDatabase<typeof schema> => {
+        return drizzle(sql, { schema });
+      },
+      inject: [POSTGRES_POOL],
+    },
+    {
       provide: DRIZZLE,
       scope: Scope.REQUEST,
       useFactory: async (
@@ -30,9 +37,6 @@ export const POSTGRES_POOL = 'POSTGRES_POOL';
       ): Promise<PostgresJsDatabase<typeof schema>> => {
         const tenantId = tenantContext.tenantId;
 
-        // Ao usar SET LOCAL no postgres.js, precisamos garantir que as queries 
-        // rodem na mesma conexão. O Drizzle no factory aqui apenas injeta o contexto.
-        // Se houver tenantId, definimos o parâmetro na sessão do postgres.
         if (tenantId) {
           await sql`SET app.current_tenant = ${tenantId}`;
         }
@@ -42,6 +46,6 @@ export const POSTGRES_POOL = 'POSTGRES_POOL';
       inject: [TenantContext, POSTGRES_POOL],
     },
   ],
-  exports: [DRIZZLE, TenantContext],
+  exports: [DRIZZLE, DRIZZLE_SINGLETON, TenantContext],
 })
 export class DatabaseModule {}

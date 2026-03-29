@@ -1,6 +1,5 @@
-import { otelSDK } from './otel-sdk';
-// Initialize OpenTelemetry SDK before NestJS starts
-otelSDK.start();
+// import { otelSDK } from './otel-sdk';
+// otelSDK.start();
 
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -8,13 +7,29 @@ import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   process.setMaxListeners(20);
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  console.log(`[BOOTSTRAP] Current NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+  
+  try {
+    const app = await NestFactory.create(AppModule, { 
+      bufferLogs: true,
+      abortOnError: false
+    });
 
-  // Use nestjs-pino for structured JSON logs
-  app.useLogger(app.get(Logger));
+    app.useLogger(app.get(Logger));
 
-  const port = process.env.PORT || 3333;
-  await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
+    const port = process.env.PORT || 3333;
+    await app.listen(port);
+    
+    // O logger pino já estará ativo aqui
+    const logger = app.get(Logger);
+    logger.log(`Application is running on: http://localhost:${port}`);
+  } catch (error) {
+    console.error('[CRITICAL BOOTSTRAP ERROR]:', error);
+    process.exit(1);
+  }
 }
-bootstrap();
+
+bootstrap().catch(err => {
+  console.error('[FATAL STARTUP ERROR]:', err);
+  process.exit(1);
+});
